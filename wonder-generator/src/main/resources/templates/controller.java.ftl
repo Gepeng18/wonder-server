@@ -10,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import ${superControllerClassPackage};
 </#if>
 import ${package.Entity}.${entity};
-import ${package.Other}.${entity}.${entity}Query;
-import ${package.Other}.${entity}.${entity}DTO;
+import ${package.Other}.${entity}Query;
+import ${package.Other}.${entity}DTO;
 import ${package.Service}.${table.serviceName};
 import io.swagger.annotations.Api;
 

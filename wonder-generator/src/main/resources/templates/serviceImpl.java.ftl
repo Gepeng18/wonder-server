@@ -1,8 +1,8 @@
 package ${package.ServiceImpl};
 
 import ${package.Entity}.${entity};
-import ${package.Other}.${entity}.${entity}Query;
-import ${package.Other}.${entity}.${entity}DTO;
+import ${package.Other}.${entity}Query;
+import ${package.Other}.${entity}DTO;
 import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 import ${superServiceImplClassPackage};

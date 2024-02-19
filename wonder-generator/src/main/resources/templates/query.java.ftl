@@ -1,4 +1,4 @@
-package ${package.Other}.${entity};
+package ${package.Other};
 
 <#list table.importPackages as pkg>
     <#if pkg != "com.baomidou.mybatisplus.annotation.TableField" && pkg != "com.baomidou.mybatisplus.annotation.TableName" &&  pkg != "com.gitee.whzzone.web.entity.BaseEntity">

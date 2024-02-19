@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.AbstractTemplateEngine;
-import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
 import com.gitee.whzzone.web.controller.EntityController;
 import com.gitee.whzzone.web.entity.BaseEntity;
@@ -95,18 +94,14 @@ public class Generator {
 
         // 4.模板配置
         // 使用Freemarker引擎模板，默认的是Velocity引擎模板
-        AbstractTemplateEngine templateEngine = new FreemarkerTemplateEngine();
+        AbstractTemplateEngine templateEngine = new EnhanceFreemarkerTemplateEngine();
         fastAutoGenerator.templateEngine(templateEngine);
 
         // 5.注入配置-自定义
         fastAutoGenerator.injectionConfig(injectionConfig -> {
             HashMap<String, String> customFileMap = new HashMap<>();
-
-            injectionConfig.beforeOutputFile((tableInfo, biConsumer) -> {
-                customFileMap.put(tableInfo.getEntityName() + "DTO.java", "/templates/dto.java.ftl");
-                customFileMap.put(tableInfo.getEntityName() + "Query.java", "/templates/query.java.ftl");
-            });
-
+            customFileMap.put("DTO.java", "/templates/dto.java.ftl");
+            customFileMap.put("Query.java", "/templates/query.java.ftl");
             injectionConfig.customFile(customFileMap);
         });
 
