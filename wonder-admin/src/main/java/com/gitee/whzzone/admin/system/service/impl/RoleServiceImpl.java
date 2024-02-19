@@ -15,7 +15,6 @@ import com.gitee.whzzone.admin.system.pojo.dto.RoleDTO;
 import com.gitee.whzzone.admin.system.pojo.query.RoleQuery;
 import com.gitee.whzzone.admin.system.service.*;
 import com.gitee.whzzone.admin.util.SecurityUtil;
-import com.gitee.whzzone.annotation.DataScope;
 import com.gitee.whzzone.web.entity.BaseEntity;
 import com.gitee.whzzone.web.pojo.other.PageData;
 import com.gitee.whzzone.web.service.impl.EntityServiceImpl;
@@ -51,7 +50,6 @@ public class RoleServiceImpl extends EntityServiceImpl<RoleMapper, Role, RoleDTO
     @Autowired
     private MarkService markService;
 
-    @DataScope("role-page")
     @Override
     public PageData<RoleDTO> page(RoleQuery query) {
         Page<Role> page = new Page<>(query.getCurPage(), query.getPageSize());

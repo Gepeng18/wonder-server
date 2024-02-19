@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Order(-80)
 @Component
-public class RoleAndDeptFilter extends OncePerRequestFilter {
+public class DeptFilter extends OncePerRequestFilter {
 
     @Autowired
     private WonderProperties wonderProperties;
@@ -42,7 +42,7 @@ public class RoleAndDeptFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            log.debug("----------------经过 RoleAndDeptFilter 前");
+            log.debug("----------------经过 DeptFilter 前");
 
             String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
             for (String ignorePath : wonderProperties.getWeb().getIgnorePath()) {
@@ -74,11 +74,11 @@ public class RoleAndDeptFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-            log.debug("----------------经过 RoleAndDeptFilter 后");
+            log.debug("----------------经过 DeptFilter 后");
         }catch (Exception e) {
             response.setHeader("content-type", "application/json");
             IoUtil.write(response.getOutputStream(), true, JSONUtil.toJsonStr(Result.error(Result.UNAUTHORIZED, e.getMessage())).getBytes());
-            log.error("RoleAndDeptFilter error: {}", e.getMessage());
+            log.error("DeptFilter error: {}", e.getMessage());
         }
     }
 }
