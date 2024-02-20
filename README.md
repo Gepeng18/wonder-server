@@ -5,7 +5,7 @@ wonder-server 一个web快速开发、灵活的数据权限管理系统
 
 优点：传统的5种权限：全部数据权限、本部门数据权限、本部门及下属部门数据、仅本人数据、自定义数据权限，其实再怎么自定义也是针对人和部门的纬度来说的，如果需求是：角色A只能订单表的销售数量>=100的订单，角色B只能订单表的销售数量<100的订单，恐怕实现不了。本项目针对这种需求就设计得更灵活了一点，仅需要针对不同的接口可视化添加一些配置即可以针对数据库表不同字段来控制数据权限。
 
-缺点：如果是控制比较复杂的查询，需要在项目代码中预先写好相关的方法来提供使用。执行时间慢那么一点，但也只是对有限制的接口来说，还是可以接受的。
+缺点：如果是控制比较复杂的查询，需要在项目代码中预先写好相关的方法来提供反射调用，获取到要限制的条件。执行时间慢那么一点，但也只是对有限制的接口来说，还是可以接受的。
 
 #### 启动报错及解决办法
 
@@ -15,12 +15,14 @@ wonder-server 一个web快速开发、灵活的数据权限管理系统
 >
 > 对wonder-processor代码修改后都要执行以上方法
 
-#### 前后端地址
-账号 admin/123456
+#### 多部门的账号请求报错及结局办法
+> 报错：无效的deptId
+> 解决办法：多部门用户需要在请求头中传递当前请求用户选择的deptId, 例如 DeptId: 32
 
-前端 https://gitee.com/whzzone/wonder-web 仅仅用来可视化测试
+#### 前端地址
+**管理员账号 admin/123456**
 
-后端 https://gitee.com/whzzone/wonder-server
+~~前端 https://gitee.com/whzzone/wonder-web 仅仅用来可视化测试~~ 没时间维护，跟不上后端功能的修改，直接基于数据库运维，主要涉及表：`sys_mark`、`sys_rule`、`sys_role`、`sys_role_mark`
 
 #### 当前数据权限思路
 使用MyBatis-Plus提供的`DataPermissionHandler`数据权限插件，使用自定义注解`@DataScope`在方法上，通过切面查询该账号拥有的角色List，是否关联有的数据规则，执行SQL前进行拦截，解析拼接SQL。
@@ -29,7 +31,9 @@ wonder-server 一个web快速开发、灵活的数据权限管理系统
 - 方案一：优先考虑提供类型为`值`的情况是否满足当前需求。~~如需要限制两个及以上字段时，使用提供类型为`方法`来处理，此时配置记录中字段`column_name`为`id`，配置对应的无参或有参方法，返回`idList`去`IN`，就能满足。例如问题中可一执行一个方法返回 付款金额大于100元 && 已经完成的订单 的`idList`去`order`表拼接`id IN( idList )` 就能满足~~
 - 方案二：已实现多规则拼接，支持`OR`、`AND`
 
-数据权限测试账号 user1/123456
+**数据权限测试账号：user1/123456**
+
+**数据权限测试接口：/wonder-server/order/list**
 
 例子 我们想在订单不分页接口限制某个角色只能查看`收获地址中存在钦北区`或者`订单金额小于等于100`的订单。
 
@@ -45,22 +49,17 @@ wonder-server 一个web快速开发、灵活的数据权限管理系统
 
 ![image-20231205112841923](https://cdn.weihuazhou.top/blog/2023/12/image-20231205112841923.png)
 
-然后使用注解`@DataScope("order-list")`在mapper的接口上，这里我们用重写MyBatis的list()接口来测试，如下：
+然后使用注解`@DataScope("order-list")`在mapper层的方法上，这里我们用重写MyBatis的list()接口来测试，如下：
 
 ```java
-// 建议使用在mapper方法接口上
 @Mapper 
 public interface OrderMapper extends BaseMapper<Order> {
-    
+    // 已限制使用在mapper层的方法上
     @DataScope("order-list")
     @Override
     List<Order> selectList(@Param(Constants.WRAPPER) Wrapper<Order> queryWrapper);
-    
 }
 
-
-// 用在service层方法上时，要注意调用的方法是否是本类的方法
-// 如果是，会导致代理失败，数据权限失效
 @Service
 public class OrderServiceImpl extends EntityServiceImpl<OrderMapper, Order, OrderDTO, OrderQuery> implements OrderService {
     
@@ -71,14 +70,12 @@ public class OrderServiceImpl extends EntityServiceImpl<OrderMapper, Order, Orde
         // ...其他条件
         return afterQueryHandler(list(queryWrapper), new BOrderQueryHandler());
     }
-    
 }
 ```
 
 在无其他查询条件调用`OrderServiceImpl#list(OrderQuery query)`方法时，原本的sql为` SELECT * FROM ex_order WHERE  deleted=0`
 
 经过数据权限处理后则为` SELECT * FROM ex_order WHERE deleted = 0 AND (order_amount <= 100 OR receiver_address LIKE '%钦北区%')`
-
 从而实现了数据权限的控制。
 
 当然这只是简单需求，复杂的需求也提供了解决办法：规则处可以配置全限定类名加方法，可以带参，解析规则时会反射执行该方法得到返回值，该功能可以实现复杂的数据权限需求，就看你怎么搭配。
@@ -88,7 +85,7 @@ public class OrderServiceImpl extends EntityServiceImpl<OrderMapper, Order, Orde
 因为我懒，不想写增删改查接口，所以写了一套基础的增删改查，主要是由`EntityController`、`EntityService`、`EntityServiceImpl`完成。只要按规范继承了相关类，即可拥有增删改查功能。
 
 maven引入
-```java
+```xml
 <dependency>
     <groupId>com.gitee.whzzone</groupId>
     <artifactId>wonder-web</artifactId>
