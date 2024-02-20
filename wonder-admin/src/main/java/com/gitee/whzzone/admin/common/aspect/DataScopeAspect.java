@@ -28,10 +28,11 @@ import java.lang.reflect.Method;
 public class DataScopeAspect {
 
     @Autowired
-    private MarkService dataScopeService;
+    private MarkService markService;
 
     // 通过ThreadLocal记录权限相关的属性值
     private static ThreadLocal<DataScopeInfo> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<Boolean> methodProcessed = new ThreadLocal<>();
 
     public static DataScopeInfo getDataScopeInfo() {
         return threadLocal.get();
@@ -45,11 +46,16 @@ public class DataScopeAspect {
     @After("methodPointCut()")
     public void clearThreadLocal() {
         threadLocal.remove();
-        log.debug("----------------数据权限信息清除----------------");
+        methodProcessed.remove();
     }
 
     @Before("methodPointCut()")
     public void doBefore(JoinPoint point) {
+        if (methodProcessed.get() != null && methodProcessed.get()) {
+            return;
+        } else {
+            methodProcessed.set(true);
+        }
         Signature signature = point.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
@@ -59,7 +65,7 @@ public class DataScopeAspect {
         try {
             if (dataScope.enabled() && !SecurityUtil.isAdmin()) {
                 String scopeName = dataScope.value();
-                DataScopeInfo dataScopeInfo = dataScopeService.execRuleByName(scopeName);
+                DataScopeInfo dataScopeInfo = markService.execRuleByName(scopeName);
                 threadLocal.set(dataScopeInfo);
                 printDebug(method ,dataScopeInfo);
             }
