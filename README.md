@@ -198,9 +198,9 @@ maven引入
     private Integer pageSize = 10;
     ```
 
-- `@EntityField` 该注解标识该字段的对数据库的操作。如下配置, 表示该字段可以新增，但不可编辑字段。
+- `@EntityField` 该注解标识该字段的对数据库的操作。如下配置, 表示该字段可以新增-非必填，但不可编辑字段。
     ```java
-    @EntityField(insert = true, update = false)
+    @EntityField(insertAble = true, updateAble = false, insertRequired = false)
     @ApiModelProperty("收货人姓名")
     private String receiverName;
     ```

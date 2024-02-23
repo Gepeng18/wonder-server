@@ -512,7 +512,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
         for (Field field : currentDtoFields) {
             EntityField webFieldAnnotation = field.getAnnotation(EntityField.class);
-            if (webFieldAnnotation == null || !webFieldAnnotation.insert()) {
+            if (webFieldAnnotation == null || !webFieldAnnotation.insertAble()) {
                 list.add(field.getName());
             }
         }
@@ -524,7 +524,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
         for (Field field : currentDtoFields) {
             EntityField webFieldAnnotation = field.getAnnotation(EntityField.class);
-            if (webFieldAnnotation == null || !webFieldAnnotation.update()) {
+            if (webFieldAnnotation == null || !webFieldAnnotation.updateAble()) {
                 list.add(field.getName());
             }
         }

@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class EntityDTO {
 
-    @EntityField(insert = false)
+    @EntityField(insertAble = false)
     @NotNull(message = "id不能为空", groups = {UpdateGroup.class})
     @ApiModelProperty("id")
     private Integer id;

@@ -16,12 +16,12 @@ import java.math.BigDecimal;
 @Data
 public class OrderDTO extends EntityDTO {
 
-    @EntityField
+    @EntityField(updateRequired = true)
     @NotBlank(message = "收货人不能为空", groups = {InsertGroup.class, UpdateGroup.class})
-    @ApiModelProperty("收货人姓名")
+    @ApiModelProperty(value = "收货人姓名", required = true)
     private String receiverName;
 
-    @EntityField(insert = false)
+    @EntityField(insertAble = true, updateAble = false)
     @ApiModelProperty("收货人手机号码")
     private String receiverPhone;
 
