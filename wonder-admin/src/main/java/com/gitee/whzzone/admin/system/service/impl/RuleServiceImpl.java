@@ -3,6 +3,7 @@ package com.gitee.whzzone.admin.system.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.gitee.whzzone.admin.system.entity.RoleMark;
 import com.gitee.whzzone.admin.system.entity.Rule;
 import com.gitee.whzzone.admin.system.mapper.RuleMapper;
 import com.gitee.whzzone.admin.system.pojo.dto.RuleDTO;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Create by whz at 2023/7/16
@@ -38,13 +40,9 @@ public class RuleServiceImpl extends EntityServiceImpl<RuleMapper, Rule, RuleDTO
     }
 
     @Override
-    public RuleDTO getByRoleIdAndMarkId(Integer roleId, Integer markId) {
-        /*List<RoleMark> roleMarkList = roleMarkService.getByRoleIdAndMarkId(roleId, markId);
-        if (roleMark != null){
-            Long ruleId = roleMark.getRuleId();
-            return afterQueryHandler(getById(ruleId));
-        }*/
-        return null;
+    public List<Integer> getRuleIdsByRoleIdAndMarkId(Integer roleId, Integer markId) {
+        List<RoleMark> roleMarkList = roleMarkService.getByRoleIdAndMarkId(roleId, markId);
+        return roleMarkList.stream().map(RoleMark::getRuleId).collect(Collectors.toList());
     }
 
     @Override

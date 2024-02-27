@@ -247,6 +247,14 @@ public class MarkServiceImpl extends EntityServiceImpl<MarkMapper, Mark, MarkDTO
         return roleMarkService.save(entity);
     }
 
+    @Override
+    public void removeRelation(Integer roleId, Integer ruleId) {
+        LambdaQueryWrapper<RoleMark> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(RoleMark::getRoleId, roleId);
+        queryWrapper.eq(RoleMark::getRuleId, ruleId);
+        roleMarkService.remove(queryWrapper);
+    }
+
     //    @Override
 //    public MarkDTO afterQueryHandler(MarkDTO dto) {
 //        if (dto.getProvideType().equals(ProvideTypeEnum.METHOD.getCode())){

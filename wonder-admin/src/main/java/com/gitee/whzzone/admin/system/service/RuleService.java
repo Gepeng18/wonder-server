@@ -14,7 +14,7 @@ public interface RuleService extends EntityService<Rule, RuleDTO, RuleQuery> {
 
     List<RuleDTO> getByMarkId(Integer markId);
 
-    RuleDTO getByRoleIdAndMarkId(Integer roleId, Integer markId);
+    List<Integer> getRuleIdsByRoleIdAndMarkId(Integer roleId, Integer markId);
 
     List<Rule> getByIds(List<Integer> ruleIds);
 }

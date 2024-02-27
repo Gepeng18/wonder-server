@@ -30,4 +30,6 @@ public interface MarkService extends EntityService<Mark, MarkDTO, MarkQuery> {
     void removeAllByRoleIdAndMarkId(Integer roleId, Integer markId);
 
     boolean addRelation(Integer roleId, Integer markId, Integer ruleId);
+
+    void removeRelation(Integer roleId, Integer ruleId);
 }

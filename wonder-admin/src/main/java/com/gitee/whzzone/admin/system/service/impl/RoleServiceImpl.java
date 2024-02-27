@@ -223,8 +223,6 @@ public class RoleServiceImpl extends EntityServiceImpl<RoleMapper, Role, RoleDTO
 
         Integer markId = rule.getMarkId();
 
-        markService.removeAllByRoleIdAndMarkId(roleId, markId);
-
         if (!markService.addRelation(roleId, markId, ruleId)) {
             throw new RuntimeException("角色关联规则失败");
         }
@@ -239,8 +237,7 @@ public class RoleServiceImpl extends EntityServiceImpl<RoleMapper, Role, RoleDTO
         if (rule == null)
             throw new RuntimeException("不存在规则：" + ruleId);
 
-        Integer markId = rule.getMarkId();
-        markService.removeAllByRoleIdAndMarkId(roleId, markId);
+        markService.removeRelation(roleId, rule.getId());
     }
 
     @Override

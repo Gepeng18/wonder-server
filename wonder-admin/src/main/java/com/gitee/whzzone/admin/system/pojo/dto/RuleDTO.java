@@ -39,9 +39,9 @@ public class RuleDTO extends EntityDTO {
     @ApiModelProperty(value = "拼接类型 OR AND", required = true)
     private String spliceType;
 
-    @EntityField
+//    @EntityField
     @NotNull(message = "表达式 EQ NE LE GT...", groups = {InsertGroup.class, UpdateGroup.class})
-    @ApiModelProperty(value = "表达式 EQ NE LE GT...", required = true)
+    @ApiModelProperty(value = "表达式 EQ NE LE GT...", required = false)
     private String expression;
 
     @EntityField
