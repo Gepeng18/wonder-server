@@ -48,9 +48,9 @@ public class EntityFieldProcessor extends AbstractProcessor {
                 EntityField entityField = element.getAnnotation(EntityField.class);
                 ApiModelProperty apiModelProperty = element.getAnnotation(ApiModelProperty.class);
 
-                boolean insert = entityField.insertAble();
-                boolean update = entityField.updateAble();
-                boolean insertRequired = entityField.insertRequired();
+                boolean addedAble = entityField.addAble();
+                boolean updateAble = entityField.updateAble();
+                boolean insertRequired = entityField.addRequired();
                 boolean updateRequired = entityField.updateRequired();
 
                 JCTree.JCVariableDecl jcVariableDecl = (JCTree.JCVariableDecl) trees.getTree(element);
@@ -73,13 +73,13 @@ public class EntityFieldProcessor extends AbstractProcessor {
                                 if (tree.lhs.toString().equals("value")) {
                                     StringBuilder stringBuilder = new StringBuilder(apiModelProperty.value());
                                     stringBuilder.append(" - ");
-                                    if (insert) {
+                                    if (addedAble) {
                                         stringBuilder.append( "【可新增：");
                                         stringBuilder.append(insertRequired ? "必填" : "非必填");
                                         stringBuilder.append("】");
                                     }
 
-                                    if (update) {
+                                    if (updateAble) {
                                         stringBuilder.append( "【可编辑：");
                                         stringBuilder.append(updateRequired ? "必填" : "非必填");
                                         stringBuilder.append("】");

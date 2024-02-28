@@ -1,7 +1,7 @@
 [![weihuazhou/wonder-server](https://gitee.com/whzzone/wonder-server/widgets/widget_card.svg?colors=ffffff,1e252b,323d47,455059,d7deea,99a0ae)](https://gitee.com/whzzone/wonder-server)
 
 ### 简介
-wonder-server 一个web快速开发、灵活的数据权限管理系统 
+wonder-server 一个web快速开发、灵活的数据权限脚手架
 
 优点：传统的5种权限：全部数据权限、本部门数据权限、本部门及下属部门数据、仅本人数据、自定义数据权限，其实再怎么自定义也是针对人和部门的纬度来说的，如果需求是：角色A只能订单表的销售数量>=100的订单，角色B只能订单表的销售数量<100的订单，恐怕实现不了。本项目针对这种需求就设计得更灵活了一点，仅需要针对不同的接口可视化添加一些配置即可以针对数据库表不同字段来控制数据权限。
 
@@ -15,14 +15,15 @@ wonder-server 一个web快速开发、灵活的数据权限管理系统
 >
 > 对wonder-processor代码修改后都要执行以上方法
 
-#### 多部门的账号请求报错及结局办法
+#### 多部门的账号请求报错及解决办法
 > 报错：无效的deptId
+> 
 > 解决办法：多部门用户需要在请求头中传递当前请求用户选择的deptId, 例如 DeptId: 32
 
 #### 前端地址
 **管理员账号 admin/123456**
 
-~~前端 https://gitee.com/whzzone/wonder-web 仅仅用来可视化测试~~ 没时间维护，跟不上后端功能的修改，直接基于数据库运维，主要涉及表：`sys_mark`、`sys_rule`、`sys_role`、`sys_role_mark`
+前端 https://gitee.com/whzzone/wonder-web 仅仅用来可视化测试，也可以直接基于数据库运维，主要涉及表：`sys_mark`、`sys_rule`、`sys_role`、`sys_role_mark`
 
 #### 当前数据权限思路
 使用MyBatis-Plus提供的`DataPermissionHandler`数据权限插件，使用自定义注解`@DataScope`在方法上，通过切面查询该账号拥有的角色List，是否关联有的数据规则，执行SQL前进行拦截，解析拼接SQL。
@@ -207,10 +208,10 @@ maven引入
 
 #### 参数校验组
 
-- `CreateGroup.class` 默认提供的添加接口会校验该分组
+- `AddGroup.class` 默认提供的添加接口会校验该分组
 - `UpdateGroup.clas` 默认提供的编辑接口会校验该分组
     ```java
-    @NotBlank(message = "收货人不能为空", groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(message = "收货人不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty("收货人姓名")
     private String receiverName;
     ```
@@ -219,22 +220,22 @@ maven引入
 
 #### 添加或更新
 
-1. 进入`beforeSaveOrUpdateHandler(dto)`方法，可以对'增改'接口参数进行统一处理
-2. '增'接口进入`beforeSaveHandler(dto)`，'改'接口进入`beforeUpdateHandler(dto)`，分别对参数进行处理
+1. 进入`beforeAddOrUpdateHandler(dto)`方法，可以对'增改'接口参数进行统一处理
+2. '增'接口进入`beforeAddHandler(dto)`，'改'接口进入`beforeUpdateHandler(dto)`，分别对参数进行处理
 3. 复制带有`XxxDTO`中带有`@EntityField`属性给实体
-4. 执行更新`updateById(entity)`或插入`save(entity)`操作
-5. 执行`afterSaveHandler(entity)`方法，可在此进行添加或更新的后置处理
+4. 执行更新`updateById(entity)`或插入`add(entity)`操作
+5. 执行`afterAddHandler(entity)`或`afterUpdateHandler(entity)`方法，可在此进行添加或更新的后置处理
 
 #### 单条查询
 
 1. 执行`getById(id)`
-2. 执行`afterQueryHandler(entity, queryHandler)`，根据不同的需求使用不同的处理器对响应的数据进行处理，返回`dto`
+2. 执行`afterQueryHandler(entity, QueryHandler.class)`，根据不同的需求使用不同的处理器对响应的数据进行处理，返回`dto`
 
 #### 列表、分页查询
 
 1. 进入`handleQueryWrapper(query)`方法，处理查询的信息，分页信息等
 2. 执行`page(queryWrapper)`查询或`list(queryWrapper)`
-3. 执行`afterQueryHandler(list, queryHandler)`，根据不同的需求使用不同的处理器对响应的数据进行处理
+3. 执行`afterQueryHandler(list, QueryHandler.class)`，根据不同的需求使用不同的处理器对响应的数据进行处理，返回`dtoList`
 
 #### 删除
 

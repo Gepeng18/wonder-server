@@ -2,7 +2,7 @@ package com.gitee.whzzone.admin.system.pojo.dto;
 
 import com.gitee.whzzone.annotation.EntityField;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,7 +27,7 @@ public class DeptDTO extends EntityDTO {
     private String parentName;
 
     @EntityField
-    @NotBlank(message = "名称不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotBlank(message = "名称不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty("名称")
     private String name;
 

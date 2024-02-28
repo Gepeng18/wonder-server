@@ -2,7 +2,7 @@ package com.gitee.whzzone.admin.business.pojo.dto;
 
 import com.gitee.whzzone.annotation.EntityField;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,11 +17,11 @@ import java.math.BigDecimal;
 public class OrderDTO extends EntityDTO {
 
     @EntityField(updateRequired = true)
-    @NotBlank(message = "收货人不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotBlank(message = "收货人不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "收货人姓名", required = true)
     private String receiverName;
 
-    @EntityField(insertAble = true, updateAble = false)
+    @EntityField(addAble = true, updateAble = false)
     @ApiModelProperty("收货人手机号码")
     private String receiverPhone;
 

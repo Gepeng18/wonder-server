@@ -20,13 +20,13 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
 
     /**
      * 插入
-     * @param dto
+     * @param dto 传输对象
      */
-    T save(D dto);
+    T add(D dto);
 
     /**
      * 更新
-     * @param dto
+     * @param dto 传输对象
      */
     T updateById(D dto);
 
@@ -54,27 +54,22 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
     /**
      * 插入后置方法
      * @param entity 实体
+     * @param dto 传输对象
      */
-    T afterSaveHandler(T entity);
+    void afterAddHandler(T entity, D dto);
 
     /**
      * 更新后置方法
      * @param entity 实体
+     * @param dto 传输对象
      */
-    T afterUpdateHandler(T entity);
+    void afterUpdateHandler(T entity, D dto);
 
     /**
      * 查询后置方法
      * @param entity 实体
      */
     D afterQueryHandler(T entity);
-
-    /**
-     * 查询后置方法
-     * @param entity 实体
-     * @param queryHandler 处理器
-     */
-    D afterQueryHandler(T entity, BaseQueryHandler<T, D> queryHandler);
 
     /**
      * 查询后置方法
@@ -88,13 +83,6 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
      * @param list 实体list
      */
     List<D> afterQueryHandler(List<T> list);
-
-    /**
-     * 实体list查询后置方法
-     * @param list 实体list
-     * @param queryHandler 处理器
-     */
-    List<D> afterQueryHandler(List<T> list, BaseQueryHandler<T, D> queryHandler);
 
     /**
      * 实体list查询后置方法
@@ -116,20 +104,20 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
     boolean isExist(Integer id);
 
     /**
-     * 插入、更新前置方法，优先级大于beforeSaveHandler和beforeUpdateHandler
-     * @param dto
+     * 插入、更新前置方法，优先级大于beforeAddHandler和beforeUpdateHandler
+     * @param dto 传输对象
      */
-    D beforeSaveOrUpdateHandler(D dto);
+    D beforeAddOrUpdateHandler(D dto);
 
     /**
      * 插入前置方法
-     * @param dto
+     * @param dto 传输对象
      */
-    D beforeSaveHandler(D dto);
+    D beforeAddHandler(D dto);
 
     /**
      * 更新前置方法
-     * @param dto
+     * @param dto 传输对象
      */
     D beforeUpdateHandler(D dto);
 
@@ -138,13 +126,6 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
      * @param query 查询参数
      */
     PageData<D> page(Q query);
-
-    /**
-     * 分页查询
-     * @param query 查询参数
-     * @param queryHandler 查询后置处理器
-     */
-    PageData<D> page(Q query, BaseQueryHandler<T, D> queryHandler);
 
     /**
      * 分页查询
@@ -158,13 +139,6 @@ public interface EntityService<T extends BaseEntity, D extends EntityDTO, Q exte
      * @param query 查询参数
      */
     List<D> list(Q query);
-
-    /**
-     * 列表查询
-     * @param query 查询参数
-     * @param queryHandler 查询后置处理器
-     */
-    List<D> list(Q query, BaseQueryHandler<T, D> queryHandler);
 
     /**
      * 列表查询

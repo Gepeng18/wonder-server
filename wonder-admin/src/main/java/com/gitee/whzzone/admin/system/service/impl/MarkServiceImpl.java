@@ -170,7 +170,7 @@ public class MarkServiceImpl extends EntityServiceImpl<MarkMapper, Mark, MarkDTO
     }
 
     @Override
-    public MarkDTO beforeSaveOrUpdateHandler(MarkDTO dto) {
+    public MarkDTO beforeAddOrUpdateHandler(MarkDTO dto) {
         if (existSameName(dto.getId(), dto.getName()))
             throw new RuntimeException("存在相同的名称：" + dto.getName());
         return dto;

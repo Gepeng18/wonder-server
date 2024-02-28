@@ -42,7 +42,7 @@ public class DeptServiceImpl extends EntityServiceImpl<DeptMapper, Dept, DeptDTO
 
     @Transactional
     @Override
-    public Dept save(DeptDTO dto) {
+    public Dept add(DeptDTO dto) {
         if (dto.getParentId() == null) {
             dto.setParentId(0);
         } else if (!isExist(dto.getParentId()))
@@ -54,11 +54,11 @@ public class DeptServiceImpl extends EntityServiceImpl<DeptMapper, Dept, DeptDTO
         if (dto.getSort() == null) {
             dto.setSort(99);
         }
-        return super.save(dto);
+        return super.add(dto);
     }
 
     @Override
-    public DeptDTO beforeSaveOrUpdateHandler(DeptDTO dto) {
+    public DeptDTO beforeAddOrUpdateHandler(DeptDTO dto) {
         if (dto.getParentId() != null && !dto.getParentId().equals(0L) && !isExist(dto.getParentId())) {
             throw new RuntimeException("父级不存在");
         }

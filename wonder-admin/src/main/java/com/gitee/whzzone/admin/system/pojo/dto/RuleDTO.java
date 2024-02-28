@@ -2,7 +2,7 @@ package com.gitee.whzzone.admin.system.pojo.dto;
 
 import com.gitee.whzzone.annotation.EntityField;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,7 +17,7 @@ import java.util.List;
 public class RuleDTO extends EntityDTO {
 
     @EntityField
-    @NotNull(message = "markId不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotNull(message = "markId不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "markId", required = true)
     private Integer markId;
 
@@ -30,22 +30,22 @@ public class RuleDTO extends EntityDTO {
     private String tableAlias;
 
     @EntityField
-    @NotNull(message = "字段名不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotNull(message = "字段名不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "字段名", required = true)
     private String columnName;
 
     @EntityField
-    @NotNull(message = "拼接类型不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotNull(message = "拼接类型不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "拼接类型 OR AND", required = true)
     private String spliceType;
 
 //    @EntityField
-    @NotNull(message = "表达式 EQ NE LE GT...", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotNull(message = "表达式 EQ NE LE GT...", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "表达式 EQ NE LE GT...", required = false)
     private String expression;
 
     @EntityField
-    @NotNull(message = "提供类型", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotNull(message = "提供类型", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "提供类型", required = true)
     private Integer provideType;
 

@@ -40,8 +40,8 @@ public class ${entity}DTO extends EntityDTO {
 <#list table.fields as field>
     <#if field != "id" && field != "createTime" && field != "createBy" && field != "updateTime" && field != "updateBy" && field != "deleted">
 
-    @ApiModelProperty("${field.comment}")
     @EntityField
+    @ApiModelProperty("${field.comment}")
     private ${field.propertyType} ${field.propertyName};
     </#if>
 </#list>

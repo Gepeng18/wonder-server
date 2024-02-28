@@ -202,14 +202,14 @@ public class UserServiceImpl extends EntityServiceImpl<UserMapper, User, UserDTO
 
     @Transactional
     @Override
-    public User save(UserDTO dto) {
+    public User add(UserDTO dto) {
         String encode = BCrypt.hashpw(StrUtil.isNotBlank(dto.getPassword()) ?
                 dto.getPassword() : wonderProperties.getUser().getDefaultPassword(),
                 BCrypt.gensalt());
 
         dto.setPassword(encode);
 
-        User save = super.save(dto);
+        User save = super.add(dto);
 
         // 添加用户与角色的关联
         roleService.addRelation(save.getId(), dto.getRoleIdList());
@@ -221,7 +221,7 @@ public class UserServiceImpl extends EntityServiceImpl<UserMapper, User, UserDTO
     }
 
     @Override
-    public UserDTO beforeSaveHandler(UserDTO dto) {
+    public UserDTO beforeAddHandler(UserDTO dto) {
         Assert.isFalse(existSameUsername(dto.getId(), dto.getUsername()), "{} 已存在", dto.getUsername());
         Assert.isFalse(existSamePhone(dto.getId(), dto.getPhone()), "{} 已存在", dto.getPhone());
         Assert.isFalse(existSameEmail(dto.getId(), dto.getEmail()), "{} 已存在", dto.getEmail());

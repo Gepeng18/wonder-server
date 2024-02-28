@@ -2,7 +2,7 @@ package com.gitee.whzzone.admin.system.pojo.dto;
 
 import com.gitee.whzzone.annotation.EntityField;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class MenuDTO extends EntityDTO {
     private String parentName;
 
     @EntityField
-    @NotBlank(message = "name不能为空", groups = {UpdateGroup.class, InsertGroup.class})
+    @NotBlank(message = "name不能为空", groups = {UpdateGroup.class, AddGroup.class})
     @ApiModelProperty(value = "name", required = true)
     private String name;
 
@@ -57,7 +57,7 @@ public class MenuDTO extends EntityDTO {
     private Integer sort;
 
     @EntityField
-    @NotNull(message = "menuType不能为空", groups = {UpdateGroup.class, InsertGroup.class})
+    @NotNull(message = "menuType不能为空", groups = {UpdateGroup.class, AddGroup.class})
     @ApiModelProperty(value = "菜单类型", required = true)
     private Integer menuType;
 

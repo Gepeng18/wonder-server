@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class DictServiceImpl extends EntityServiceImpl<DictMapper, Dict, DictDTO, DictQuery> implements DictService {
 
     @Override
-    public DictDTO beforeSaveOrUpdateHandler(DictDTO dto) {
+    public DictDTO beforeAddOrUpdateHandler(DictDTO dto) {
         if (existSameDictCode(dto.getId(), dto.getDictCode())){
             throw new RuntimeException("存在相同的字典编码");
         }

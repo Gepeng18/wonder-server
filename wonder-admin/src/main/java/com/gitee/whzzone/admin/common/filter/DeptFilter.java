@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
 import com.gitee.whzzone.admin.common.properties.WonderProperties;
 import com.gitee.whzzone.admin.common.security.LoginUser;
+import com.gitee.whzzone.admin.system.pojo.dto.RoleDTO;
 import com.gitee.whzzone.admin.util.SecurityUtil;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
 import com.gitee.whzzone.web.pojo.other.Result;
@@ -70,6 +71,12 @@ public class DeptFilter extends OncePerRequestFilter {
                         throw new RuntimeException("无效的deptId");
                     }
                 }
+            }
+
+            // 处理角色
+            long roleEnabledCount = loginUser.getRoles().stream().filter(RoleDTO::getEnabled).count();
+            if (roleEnabledCount == 0) {
+                throw new RuntimeException("该用户所属角色已被禁用");
             }
 
             filterChain.doFilter(request, response);

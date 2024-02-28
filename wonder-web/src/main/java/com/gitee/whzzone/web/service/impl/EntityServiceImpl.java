@@ -39,19 +39,19 @@ import java.util.stream.Collectors;
  * @author Create by whz at 2023/7/16
  */
 public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseEntity, D extends EntityDTO,
-    Q extends EntityQuery> extends ServiceImpl<M, T> implements EntityService<T, D, Q> {
+        Q extends EntityQuery> extends ServiceImpl<M, T> implements EntityService<T, D, Q> {
 
     @Autowired
     private ApplicationContext context;
 
     private final Class<T> currentEntityClass =
-        (Class<T>)ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 1);
+            (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 1);
 
     private final Class<D> currentDtoClass =
-        (Class<D>)ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 2);
+            (Class<D>) ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 2);
 
     private final Class<Q> currentQueryClass =
-        (Class<Q>)ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 3);
+            (Class<Q>) ReflectionKit.getSuperClassGenericType(this.getClass(), EntityServiceImpl.class, 3);
 
     private final Field[] currentEntityFields = CommonUtil.getAllFieldsIncludingParents(currentEntityClass);
 
@@ -62,17 +62,17 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     private final String[] updateIgnoreField = initUpdateIgnoreField();
 
     private final List<Field> currentQueryFields =
-        Arrays.stream(CommonUtil.getAllFieldsIncludingParents(currentQueryClass))
-            .filter(f -> !Modifier.isStatic(f.getModifiers())).collect(Collectors.toList());
+            Arrays.stream(CommonUtil.getAllFieldsIncludingParents(currentQueryClass))
+                    .filter(f -> !Modifier.isStatic(f.getModifiers())).collect(Collectors.toList());
 
     private final Map<String, Query> queryFieldMap = initQueryFieldMap();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public T save(D dto) {
+    public T add(D dto) {
         try {
-            dto = beforeSaveOrUpdateHandler(dto);
-            dto = beforeSaveHandler(dto);
+            dto = beforeAddOrUpdateHandler(dto);
+            dto = beforeAddHandler(dto);
 
             T entity = currentEntityClass.getDeclaredConstructor().newInstance();
 
@@ -82,7 +82,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
             if (!save) {
                 throw new RuntimeException("操作失败");
             }
-            afterSaveHandler(entity);
+            afterAddHandler(entity, dto);
             return entity;
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,27 +93,24 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     @Override
     @Transactional(rollbackFor = Exception.class)
     public T updateById(D dto) {
-        try {
-            dto = beforeSaveOrUpdateHandler(dto);
-            dto = beforeUpdateHandler(dto);
+        dto = beforeAddOrUpdateHandler(dto);
+        dto = beforeUpdateHandler(dto);
 
-            Integer id = dto.getId();
-            T entity = getById(id);
-            if (entity == null) {
-                throw new RuntimeException(StrUtil.format("【{}】不存在", id));
-            }
-
-            BeanUtil.copyProperties(dto, entity, updateIgnoreField);
-
-            boolean b = super.updateById(entity);
-            if (!b) {
-                throw new RuntimeException("操作失败");
-            }
-            return afterUpdateHandler(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+        Integer id = dto.getId();
+        T entity = getById(id);
+        if (entity == null) {
+            throw new RuntimeException(StrUtil.format("【{}】不存在", id));
         }
+
+        BeanUtil.copyProperties(dto, entity, updateIgnoreField);
+
+        boolean b = super.updateById(entity);
+        if (!b) {
+            throw new RuntimeException("操作失败");
+        }
+
+        afterUpdateHandler(entity, dto);
+        return entity;
     }
 
     @Override
@@ -145,13 +142,13 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     }
 
     @Override
-    public T afterSaveHandler(T entity) {
-        return entity;
+    public void afterAddHandler(T entity, D dto) {
+
     }
 
     @Override
-    public T afterUpdateHandler(T entity) {
-        return entity;
+    public void afterUpdateHandler(T entity, D dto) {
+
     }
 
     @Override
@@ -160,28 +157,19 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     }
 
     @Override
-    public D afterQueryHandler(T entity, BaseQueryHandler<T, D> queryHandler) {
-        try {
-            if (Objects.isNull(queryHandler)) {
-                return afterQueryHandler(entity);
-            }
-            return queryHandler.process(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
     public D afterQueryHandler(T entity, Class<? extends BaseQueryHandler<T, D>> queryHandlerClass) {
         try {
+            if (queryHandlerClass == null) {
+                return afterQueryHandler(entity);
+            }
+
             BaseQueryHandler<T, D> queryHandler;
             try {
                 queryHandler = context.getBean(queryHandlerClass);
             } catch (NoSuchBeanDefinitionException ignored) {
                 queryHandler = queryHandlerClass.getDeclaredConstructor().newInstance();
             }
-            return afterQueryHandler(entity, queryHandler);
+            return queryHandler.process(entity);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -190,49 +178,36 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
     @Override
     public List<D> afterQueryHandler(List<T> list) {
-        return afterQueryHandler(list, new BaseQueryHandler<T, D>() {
-            @Override
-            public D process(T entity) {
-                return afterQueryHandler(entity);
-            }
-        });
-    }
-
-    @Override
-    public List<D> afterQueryHandler(List<T> list, BaseQueryHandler<T, D> queryHandler) {
-        try {
-            List<D> dList = new ArrayList<>();
-
-            if (CollectionUtil.isEmpty(list)) {
-                return dList;
-            }
-
-            for (T entity : list) {
-                D dto = afterQueryHandler(entity, queryHandler);
-                dList.add(dto);
-            }
-            return dList;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        return afterQueryHandler(list, null);
     }
 
     @Override
     public List<D> afterQueryHandler(List<T> list, Class<? extends BaseQueryHandler<T, D>> queryHandlerClass) {
-        try {
+        // 当处理器为空，
+        if (queryHandlerClass == null) {
             List<D> dList = new ArrayList<>();
             if (CollectionUtil.isEmpty(list)) {
                 return dList;
             }
 
             for (T entity : list) {
-                dList.add(afterQueryHandler(entity, queryHandlerClass));
+                dList.add(afterQueryHandler(entity));
             }
+
             return dList;
+        }
+
+        try {
+            // 当处理器不为空
+            BaseQueryHandler<T, D> queryHandler;
+            try {
+                queryHandler = context.getBean(queryHandlerClass);
+            } catch (Exception ignored) {
+                queryHandler = queryHandlerClass.getDeclaredConstructor().newInstance();
+            }
+            return queryHandler.process(list);
+
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -252,12 +227,12 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     }
 
     @Override
-    public D beforeSaveOrUpdateHandler(D dto) {
+    public D beforeAddOrUpdateHandler(D dto) {
         return dto;
     }
 
     @Override
-    public D beforeSaveHandler(D dto) {
+    public D beforeAddHandler(D dto) {
         return dto;
     }
 
@@ -268,83 +243,32 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
     @Override
     public PageData<D> page(Q query) {
-        return page(query, new BaseQueryHandler<T, D>() {
-            @Override
-            public D process(T entity) {
-                return afterQueryHandler(entity);
-            }
-        });
-    }
-
-    @Override
-    public PageData<D> page(Q query, BaseQueryHandler<T, D> queryHandler) {
-        try {
-            QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
-
-            IPage<T> page = new Page<>(query.getCurPage(), query.getPageSize());
-
-            page(page, queryWrapper);
-
-            List<D> dList = afterQueryHandler(page.getRecords(), queryHandler);
-
-            return new PageData<>(dList, page.getTotal(), page.getPages());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
+        return page(query, null);
     }
 
     @Override
     public PageData<D> page(Q query, Class<? extends BaseQueryHandler<T, D>> queryHandlerClass) {
-        try {
-            QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
+        QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
 
-            IPage<T> page = new Page<>(query.getCurPage(), query.getPageSize());
+        IPage<T> page = new Page<>(query.getCurPage(), query.getPageSize());
 
-            page(page, queryWrapper);
+        page(page, queryWrapper);
 
-            List<D> dList = afterQueryHandler(page.getRecords(), queryHandlerClass);
+        List<D> dList = afterQueryHandler(page.getRecords(), queryHandlerClass);
 
-            return new PageData<>(dList, page.getTotal(), page.getPages());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
+        return new PageData<>(dList, page.getTotal(), page.getPages());
     }
 
     @Override
     public List<D> list(Q query) {
-        try {
-            QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
-            return afterQueryHandler(list(queryWrapper));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public List<D> list(Q query, BaseQueryHandler<T, D> queryHandler) {
-        try {
-            QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
-            return afterQueryHandler(list(queryWrapper), queryHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
+        QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
+        return afterQueryHandler(list(queryWrapper));
     }
 
     @Override
     public List<D> list(Q query, Class<? extends BaseQueryHandler<T, D>> queryHandlerClass) {
-        try {
-            QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
-            return afterQueryHandler(list(queryWrapper), queryHandlerClass);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
+        QueryWrapper<T> queryWrapper = handleQueryWrapper(query);
+        return afterQueryHandler(list(queryWrapper), queryHandlerClass);
     }
 
     @Override
@@ -381,7 +305,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
                 }
 
                 String columnName = StrUtil.isBlank(queryAnnotation.column()) ? StrUtil.toUnderlineCase(field.getName())
-                    : queryAnnotation.column();
+                        : queryAnnotation.column();
 
                 switch (queryAnnotation.expression()) {
                     case EQ:
@@ -452,7 +376,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
             String sortFieldName = sort.getField();
             Optional<Field> optional =
-                Arrays.stream(currentEntityFields).filter(field -> sortFieldName.equals(field.getName())).findFirst();
+                    Arrays.stream(currentEntityFields).filter(field -> sortFieldName.equals(field.getName())).findFirst();
 
             if (!optional.isPresent()) {
                 throw new RuntimeException("无效的排序字段：" + sortFieldName);
@@ -467,7 +391,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
     }
 
     private void handleBetween(QueryWrapper<T> queryWrapper, Map<String, Field[]> betweenFieldMap, Q query)
-        throws IllegalAccessException {
+            throws IllegalAccessException {
         Set<String> keySet = betweenFieldMap.keySet();
         for (String columnName : keySet) {
             // 已在编译时做了相关校验，在此无须做重复且耗时的校验
@@ -486,14 +410,14 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
             if (field1.get(query) instanceof Date || field1.get(query) instanceof LocalDateTime || field1.get(query) instanceof LocalDate) {
                 if (ThenerUtil.compareFields(field1, field2, query)) {
                     queryWrapper.apply("date_format(" + columnName + ",'%y%m%d') >= date_format({0},'%y%m%d')",
-                        field1.get(query));
+                            field1.get(query));
                     queryWrapper.apply("date_format(" + columnName + ",'%y%m%d') <= date_format({0},'%y%m%d')",
-                        field2.get(query));
+                            field2.get(query));
                 } else {
                     queryWrapper.apply("date_format(" + columnName + ",'%y%m%d') <= date_format({0},'%y%m%d')",
-                        field1.get(query));
+                            field1.get(query));
                     queryWrapper.apply("date_format(" + columnName + ",'%y%m%d') >= date_format({0},'%y%m%d')",
-                        field2.get(query));
+                            field2.get(query));
                 }
             } else {
                 // 其他类型，数字、字符等等实现了Comparable接口的类型
@@ -512,7 +436,7 @@ public abstract class EntityServiceImpl<M extends BaseMapper<T>, T extends BaseE
 
         for (Field field : currentDtoFields) {
             EntityField webFieldAnnotation = field.getAnnotation(EntityField.class);
-            if (webFieldAnnotation == null || !webFieldAnnotation.insertAble()) {
+            if (webFieldAnnotation == null || !webFieldAnnotation.addAble()) {
                 list.add(field.getName());
             }
         }

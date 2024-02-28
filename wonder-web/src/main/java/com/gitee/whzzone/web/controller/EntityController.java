@@ -7,7 +7,7 @@ import com.gitee.whzzone.web.pojo.other.PageData;
 import com.gitee.whzzone.web.pojo.other.Result;
 import com.gitee.whzzone.web.pojo.query.EntityQuery;
 import com.gitee.whzzone.web.service.EntityService;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,8 @@ public abstract class EntityController<T extends BaseEntity, S extends EntitySer
     @ApiLogger
     @ApiOperation("保存")
     @PostMapping
-    public Result<T> save(@Validated(InsertGroup.class) @RequestBody D dto){
-        return Result.ok("操作成功", service.save(dto));
+    public Result<T> add(@Validated(AddGroup.class) @RequestBody D dto){
+        return Result.ok("操作成功", service.add(dto));
     }
 
     @ApiLogger

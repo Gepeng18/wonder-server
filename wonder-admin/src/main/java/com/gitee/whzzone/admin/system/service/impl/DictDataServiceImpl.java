@@ -26,7 +26,7 @@ public class DictDataServiceImpl extends EntityServiceImpl<DictDataMapper, DictD
     private DictService dictService;
 
     @Override
-    public DictDataDTO beforeSaveOrUpdateHandler(DictDataDTO dto) {
+    public DictDataDTO beforeAddOrUpdateHandler(DictDataDTO dto) {
         if (!dictService.isExist(dto.getDictId())) {
             throw new RuntimeException("不存在字典：" + dto.getDictId());
         }

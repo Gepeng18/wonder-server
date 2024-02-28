@@ -2,7 +2,7 @@ package com.gitee.whzzone.admin.system.pojo.dto;
 
 import com.gitee.whzzone.annotation.EntityField;
 import com.gitee.whzzone.web.pojo.dto.EntityDTO;
-import com.gitee.whzzone.web.validation.groups.InsertGroup;
+import com.gitee.whzzone.web.validation.groups.AddGroup;
 import com.gitee.whzzone.web.validation.groups.UpdateGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class MarkDTO extends EntityDTO {
 
     @EntityField
-    @NotBlank(message = "名称不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    @NotBlank(message = "名称不能为空", groups = {AddGroup.class, UpdateGroup.class})
     @ApiModelProperty(value = "名称", required = true)
     private String name;
 

@@ -158,10 +158,7 @@ public class MenuServiceImpl extends EntityServiceImpl<MenuMapper, Menu, MenuDTO
     }
 
     @Override
-    public MenuDTO beforeSaveHandler(MenuDTO dto) {
-        if (existSameRouteName(dto.getId(), dto.getRouteName()))
-            throw new RuntimeException("存在相同的路由名称：" + dto.getRouteName());
-
+    public MenuDTO beforeAddHandler(MenuDTO dto) {
         if (existSameRouteName(dto.getId(), dto.getRouteName()))
             throw new RuntimeException("存在相同的路由名称：" + dto.getRouteName());
 
@@ -169,15 +166,15 @@ public class MenuServiceImpl extends EntityServiceImpl<MenuMapper, Menu, MenuDTO
     }
 
     @Override
-    public Menu save(MenuDTO dto) {
+    public Menu add(MenuDTO dto) {
         if (dto.getParentId() == null){
             dto.setParentId(0);
         }
-        return super.save(dto);
+        return super.add(dto);
     }
 
     @Override
-    public MenuDTO beforeSaveOrUpdateHandler(MenuDTO dto) {
+    public MenuDTO beforeAddOrUpdateHandler(MenuDTO dto) {
         if (dto.getParentId() == null){
             dto.setParentId(0);
         }

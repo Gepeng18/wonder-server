@@ -23,7 +23,7 @@ public class AsyncConfig implements AsyncConfigurer {
         int processors = Runtime.getRuntime().availableProcessors();
         log.warn("java虚拟机可使用的处理成器数量：{}", processors);
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(processors);
+        executor.setCorePoolSize(processors + 1);
         executor.setMaxPoolSize(processors * 2);
         executor.setQueueCapacity(50);
         executor.setThreadNamePrefix("async-thread-");

@@ -7,7 +7,7 @@ import com.gitee.whzzone.admin.business.entity.Order;
 import com.gitee.whzzone.admin.business.mapper.OrderMapper;
 import com.gitee.whzzone.admin.business.pojo.dto.OrderDTO;
 import com.gitee.whzzone.admin.business.pojo.query.OrderQuery;
-import com.gitee.whzzone.admin.business.queryhandler.order.BOrderQueryHandler;
+import com.gitee.whzzone.admin.business.queryhandler.order.AOrderQueryHandler;
 import com.gitee.whzzone.admin.business.service.OrderService;
 import com.gitee.whzzone.web.entity.BaseEntity;
 import com.gitee.whzzone.web.service.impl.EntityServiceImpl;
@@ -36,11 +36,10 @@ public class OrderServiceImpl extends EntityServiceImpl<OrderMapper, Order, Orde
         queryWrapper.eq(StrUtil.isNotBlank(query.getReceiverAddress()), Order::getReceiverAddress, query.getReceiverAddress());
         queryWrapper.eq(query.getOrderStatus() != null, Order::getOrderStatus, query.getOrderStatus());
         // AOrderQueryHandler 已注入容器
-//        return afterQueryHandler(list(queryWrapper), AOrderQueryHandler.class);
+        return afterQueryHandler(list(queryWrapper), AOrderQueryHandler.class);
 
         // BOrderQueryHandler未注入容器
-        return afterQueryHandler(list(queryWrapper), new BOrderQueryHandler());
-//        return afterQueryHandler(orderMapper.listTest(1), new BOrderQueryHandler());
+//        return afterQueryHandler(list(queryWrapper), BOrderQueryHandler.class);
     }
 
     @Override

@@ -107,7 +107,7 @@ public class RoleServiceImpl extends EntityServiceImpl<RoleMapper, Role, RoleDTO
     }
 
     @Override
-    public RoleDTO beforeSaveHandler(RoleDTO dto) {
+    public RoleDTO beforeAddHandler(RoleDTO dto) {
         Assert.isFalse(existSameCode(dto.getId(), dto.getCode()), "{} 已存在", dto.getCode());
         Assert.isFalse(existSameName(dto.getId(), dto.getName()), "{} 已存在", dto.getName());
         return dto;
@@ -186,8 +186,8 @@ public class RoleServiceImpl extends EntityServiceImpl<RoleMapper, Role, RoleDTO
     }
 
     @Override
-    public Role save(RoleDTO dto) {
-        Role save = super.save(dto);
+    public Role add(RoleDTO dto) {
+        Role save = super.add(dto);
         // 添加角色与权限的关联
         roleMenuService.addRelation(save.getId(), dto.getMenuIds());
         return save;
